@@ -252,7 +252,7 @@ void Matrix_Column_Multiplication(Matrix_Type A, Matrix_datatype multiplier, uns
 }
 
 // 行初等变换, 第i1行元乘一个数加给i2行元
-void Matrix_Row_Add2Another(Matrix_Type A, Matrix_datatype multiplier, unsigned int row, unsigned int col, unsigned int i1, unsigned int i2){
+void Matrix_Row_Add2Another(Matrix_Type A, unsigned int row, unsigned int col, Matrix_datatype multiplier, unsigned int i1, unsigned int i2){
     // 检查输入行数是否在范围内
     if(i1 >= row || i2 >= row){
         printf("行数超出矩阵的行大小\n");
@@ -260,11 +260,11 @@ void Matrix_Row_Add2Another(Matrix_Type A, Matrix_datatype multiplier, unsigned 
     }
 
     for(unsigned int j = 0; j < col; j++)
-        ele(A, col, i2, j) = multiplier * ele(A, col, i1, j);
+        ele(A, col, i2, j) += multiplier * ele(A, col, i1, j);
 }
 
 // 列初等变换, 第j1列元乘一个数加给j2列元
-void Matrix_Column_Add2Another(Matrix_Type A, Matrix_datatype multiplier, unsigned int row, unsigned int col, unsigned int j1, unsigned int j2){
+void Matrix_Column_Add2Another(Matrix_Type A, unsigned int row, unsigned int col, Matrix_datatype multiplier, unsigned int j1, unsigned int j2){
     // 检查输入列数是否在范围内
     if(j1 >= col || j2 >= col){
         printf("列数超出矩阵的列大小\n");
