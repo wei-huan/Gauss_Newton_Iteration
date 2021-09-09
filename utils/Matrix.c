@@ -79,6 +79,12 @@ void Matrix_Inverse_Adjoint_Matrix(Matrix_Type A, Matrix_Type B, int m){
     for(int j = 0; j < m; j++)
         detA += ele(A, m, 0, j) * ele(B, m, 0, j);
     // printf("detA: %.2f\n", detA);
+
+    //detA == 0说明矩阵不可逆
+    if(detA == 0){
+        printf("矩阵不可逆\n");
+        return;
+    }
     
     // 逆矩阵 B
     for(int i = 0; i < m; i++)
@@ -90,6 +96,7 @@ void Matrix_Inverse_Adjoint_Matrix(Matrix_Type A, Matrix_Type B, int m){
 void Matrix_Inverse_Gauss_Jordan(Matrix_Type A, Matrix_Type B, int m){
     Init_Matrix_Identity(B, m);
     
+    //
 }
 
 // 求矩阵关于某一个元素aij的代数余子式, 即二维数组矩阵A下标为ij的元素的代数余子式
