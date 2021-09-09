@@ -92,11 +92,47 @@ void Matrix_Inverse_Adjoint_Matrix(Matrix_Type A, Matrix_Type B, unsigned int m)
             ele(B, m, i, j)= ele(B, m, i, j) / detA;
 }
 
-// 高斯约当消元法求A的逆矩阵B
+// 高斯约当消元法求A的逆矩阵B, 即行初等变换
 void Matrix_Inverse_Gauss_Jordan(Matrix_Type A, Matrix_Type B, unsigned int m){
+    unsigned int switch_row = 0;
+
+    // 将B初始化为单位矩阵
     Init_Matrix_Identity(B, m);
     
-    // 
+    /* 行初等变换将A化为单位矩阵, 同时对B做相同的操作 */
+    // 对每一列做相同的操作
+    for(unsigned int j = 0; j < m; j++){
+        for(unsigned int i = j; i < m; i++){
+            // 先确定a[i][j]是不是0, 如果是得先调换另一行
+            if(ele(A, m, i, j) == (Matrix_datatype)0.0f){
+                // 如果没得调换说明有全0列, 说明没有逆矩阵, 直接退出函数
+                if(is_Matrix_Column_Zero((Matrix_Type)A, m, m, j) == true){
+                    printf("矩阵有全0列, 没有逆矩阵");
+                    return ;
+                }
+
+                // 如果有该列有非0元则找到首个非0元所在的行调换
+                switch_row = 0;
+                while(ele(A, m, switch_row, j) == (Matrix_datatype)0.0f)
+                    switch_row++;
+
+                Matrix_Row_Switch((Matrix_Type)A, m, m, i, switch_row);
+                Matrix_Row_Switch((Matrix_Type)B, m, m, i, switch_row);
+            }
+
+            // 将a[i][j]系数化为1
+            Matrix_Row_Multiplication((Matrix_Type)A, m, m, (1.0f / ele(A, m, i, j)), i);
+            Matrix_Row_Multiplication((Matrix_Type)B, m, m, (1.0f / ele(B, m, i, j)), i);
+
+            // 将其他列化为0
+            for(unsigned int k = 0; k < m; k++){
+                if(k != i){
+                    Matrix_Row_Add2Another((Matrix_Type)A, m, m, (-1.0f * ele(A, m, k, j)), i, k);
+                    Matrix_Row_Add2Another((Matrix_Type)B, m, m, (-1.0f * ele(B, m, k, j)), i, k);
+                }
+            }
+        }
+    }
 }
 
 // 求矩阵关于某一个元素aij的代数余子式, 即二维数组矩阵A下标为ij的元素的代数余子式
@@ -216,7 +252,7 @@ void Matrix_Column_Switch(Matrix_Type A, unsigned int row, unsigned int col, uns
 }
 
 // 行初等变换, 第i行元乘非零数
-void Matrix_Row_Multiplication(Matrix_Type A, Matrix_datatype multiplier, unsigned int row, unsigned int col, unsigned int i){
+void Matrix_Row_Multiplication(Matrix_Type A, unsigned int row, unsigned int col, Matrix_datatype multiplier, unsigned int i){
     // 检查输入行数是否在范围内
     if(i >= row){
         printf("行数超出矩阵的行大小\n");
@@ -234,7 +270,7 @@ void Matrix_Row_Multiplication(Matrix_Type A, Matrix_datatype multiplier, unsign
 }
 
 // 列初等变换, 第j列元乘非零数
-void Matrix_Column_Multiplication(Matrix_Type A, Matrix_datatype multiplier, unsigned int row, unsigned int col, unsigned int j){
+void Matrix_Column_Multiplication(Matrix_Type A, unsigned int row, unsigned int col, Matrix_datatype multiplier, unsigned int j){
     // 检查输入列数是否在范围内
     if(j >= col){
         printf("列数超出矩阵的列大小\n");
@@ -273,4 +309,22 @@ void Matrix_Column_Add2Another(Matrix_Type A, unsigned int row, unsigned int col
 
     for(unsigned int i = 0; i < row; i++)
         ele(A, col, i, j2) += multiplier * ele(A, col, i, j1);
+}
+
+// 检查矩阵A第i行是不是全为0
+bool is_Matrix_Row_Zero(Matrix_Type A, unsigned int row, unsigned int col, unsigned int i){
+    for(unsigned int j = 0; j < col; j++)
+        if(ele(A, col, i, j) != (Matrix_datatype)0)
+            return false;
+
+    return true;
+}
+
+// 检查矩阵A第j列是不是全为0
+bool is_Matrix_Column_Zero(Matrix_Type A, unsigned int row, unsigned int col, unsigned int j){
+    for(unsigned int i = 0; i < row; i++)
+        if(ele(A, col, i, j) != (Matrix_datatype)0)
+            return false;
+
+    return true;
 }
