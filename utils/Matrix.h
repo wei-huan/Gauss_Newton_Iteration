@@ -30,4 +30,6 @@ void Matrix_Row_Switch(Matrix_Type A, unsigned int row, unsigned int col, unsign
 void Matrix_Column_Switch(Matrix_Type A, unsigned int row, unsigned int col, unsigned int col1, unsigned int col2);
 void Matrix_Row_Multiplication(Matrix_Type A, Matrix_datatype multiplier, unsigned int row, unsigned int col, unsigned int i);
 void Matrix_Column_Multiplication(Matrix_Type A, Matrix_datatype multiplier, unsigned int row, unsigned int col, unsigned int j);
+void Matrix_Row_Add2Another(Matrix_Type A, Matrix_datatype multiplier, unsigned int row, unsigned int col, unsigned int i1, unsigned int i2);
+void Matrix_Column_Add2Another(Matrix_Type A, Matrix_datatype multiplier, unsigned int row, unsigned int col, unsigned int j1, unsigned int j2);
 #endif /*MATRIX_H*/
