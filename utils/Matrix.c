@@ -67,17 +67,24 @@ void Matrix_Multiplication(Matrix_Type A, Matrix_Type B, Matrix_Type C, unsigned
 // B = A-1 A为m阶方阵, B = A-1 = A* / detA
 void Matrix_Inverse_Adjoint_Matrix(Matrix_Type A, Matrix_Type B, unsigned int m){
     Matrix_datatype detA = 0.0;
+    Matrix_datatype C[4][4] = {0.0};
 
-    // 求 A 的伴随矩阵
+    // 求 A 的伴随矩阵 B
     for(unsigned int i = 0; i < m; i++)
         for(unsigned int j = 0; j < m; j++)
             ele(B, m, i, j) = pow(-1, i + j) * Matrix_Cofactor(A, m, j, i);
-        
-    // Visit_Matrix(B, m, m);
+    
+    printf("A*:\n");
+    Visit_Matrix(B, m, m);
+
+    // A * A*
+    Matrix_Multiplication((Matrix_Type)A, (Matrix_Type)B, (Matrix_Type)C, 4, 4, 4);
+    printf("A * A*:\n");
+    Visit_Matrix((Matrix_Type)C, m, m);
 
     // 求 A 的行列式 detA
     for(unsigned int j = 0; j < m; j++)
-        detA += ele(A, m, 0, j) * ele(B, m, 0, j);
+        detA += ele(A, m, 0, j) * ele(B, m, j, 0);
     printf("detA: %.2f\n", detA);
 
     //detA == 0说明矩阵不可逆
@@ -89,13 +96,14 @@ void Matrix_Inverse_Adjoint_Matrix(Matrix_Type A, Matrix_Type B, unsigned int m)
     // 逆矩阵 B
     for(unsigned int i = 0; i < m; i++)
         for(unsigned int j = 0; j < m; j++)
-            ele(B, m, i, j)= ele(B, m, i, j) / detA;
+            ele(B, m, i, j) = ele(B, m, i, j) / detA;
 }
 
 // 高斯约当消元法求A的逆矩阵B, 即行初等变换
 void Matrix_Inverse_Gauss_Jordan(Matrix_Type A, Matrix_Type B, unsigned int m){
     unsigned int switch_row = 0;
     unsigned int i = 0;
+
     // 将B初始化为单位矩阵
     Init_Matrix_Identity(B, m);
 
@@ -103,58 +111,37 @@ void Matrix_Inverse_Gauss_Jordan(Matrix_Type A, Matrix_Type B, unsigned int m){
     // 对每一列做相同的操作
     for(unsigned int j = 0; j < m; j++){
         i = j;
-            // 先确定a[i][j]是不是0, 如果是得先调换另一行
-            if(ele(A, m, i, j) == (Matrix_datatype)0.0f){
-                // // 如果没得调换说明有全0列, 说明没有逆矩阵, 直接退出函数
-                // if(is_Matrix_Column_Zero((Matrix_Type)A, m, m, j) == true){
-                //     printf("矩阵有全0列, 没有逆矩阵");
-                //     return ;
-                // }
 
-                // 从下一行开始查找该列是否有非0元, 如果有该列有非0元则找到首个非0元所在的行调换
-                switch_row = i + 1;
-                while(switch_row < m)
-                    if(ele(A, m, switch_row, j) == (Matrix_datatype)0.0f)
-                        switch_row++;
-                    else
-                        break;
+        // 先确定a[i][j]是不是0, 如果是得先调换另一行
+        if(ele(A, m, i, j) == (Matrix_datatype)0.0f){
+            // 从下一行开始查找该列是否有非0元, 如果有该列有非0元则找到首个非0元所在的行调换
+            switch_row = i + 1;
+            while(switch_row < m)
+                if(ele(A, m, switch_row, j) == (Matrix_datatype)0.0f)
+                    switch_row++;
+                else
+                    break;
                     
-                if(switch_row == m){
-                    printf("矩阵该行以下全0, 没有逆矩阵\n");
-                    return ;
-                }
-
-                Matrix_Row_Switch((Matrix_Type)B, m, m, i, switch_row);
-                Matrix_Row_Switch((Matrix_Type)A, m, m, i, switch_row);
-
-                // printf("A:\n");
-                // Visit_Matrix((Matrix_Type)A, 3, 3);
-                // printf("B:\n");
-                // Visit_Matrix((Matrix_Type)B, 3, 3);
+            if(switch_row == m){
+                printf("矩阵该行以下全0, 没有逆矩阵\n");
+                return ;
             }
 
-            // 将a[i][j]系数化为1
-            Matrix_Row_Multiplication((Matrix_Type)B, m, m, (1.0f / ele(A, m, i, j)), i);
-            Matrix_Row_Multiplication((Matrix_Type)A, m, m, (1.0f / ele(A, m, i, j)), i);
+            Matrix_Row_Switch((Matrix_Type)B, m, m, i, switch_row);
+            Matrix_Row_Switch((Matrix_Type)A, m, m, i, switch_row);
+        }
 
-            // printf("A:\n");
-            // Visit_Matrix((Matrix_Type)A, 3, 3);
-            // printf("B:\n");
-            // Visit_Matrix((Matrix_Type)B, 3, 3);
+        // 将a[i][j]系数化为1
+        Matrix_Row_Multiplication((Matrix_Type)B, m, m, (1.0f / ele(A, m, i, j)), i);
+        Matrix_Row_Multiplication((Matrix_Type)A, m, m, (1.0f / ele(A, m, i, j)), i);
 
-            // 将其他列化为0
-            for(unsigned int k = 0; k < m; k++){
-                if(k != i){
-                    Matrix_Row_Add2Another((Matrix_Type)B, m, m, (-1.0f * ele(A, m, k, j)), i, k);
-                    Matrix_Row_Add2Another((Matrix_Type)A, m, m, (-1.0f * ele(A, m, k, j)), i, k);
-                }
+        // 将其他列化为0
+        for(unsigned int k = 0; k < m; k++){
+            if(k != i){
+                Matrix_Row_Add2Another((Matrix_Type)B, m, m, (-1.0f * ele(A, m, k, j)), i, k);
+                Matrix_Row_Add2Another((Matrix_Type)A, m, m, (-1.0f * ele(A, m, k, j)), i, k);
             }
-
-            // printf("A:\n");
-            // Visit_Matrix((Matrix_Type)A, 3, 3);
-            // printf("B:\n");
-            // Visit_Matrix((Matrix_Type)B, 3, 3);
-        
+        }
     }
 }
 
@@ -363,3 +350,6 @@ bool is_Matrix_Column_Zero(Matrix_Type A, unsigned int row, unsigned int col, un
 
     return true;
 }
+
+bool is_Matrix_Upper_Triangle(Matrix_Type A, unsigned int row, unsigned int col);
+bool is_Matrix_Lower_Triangle(Matrix_Type A, unsigned int row, unsigned int col);

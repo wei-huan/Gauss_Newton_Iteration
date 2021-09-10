@@ -35,4 +35,6 @@ void Matrix_Row_Add2Another(Matrix_Type A, unsigned int row, unsigned int col, M
 void Matrix_Column_Add2Another(Matrix_Type A, unsigned int row, unsigned int col, Matrix_datatype multiplier,unsigned int j1, unsigned int j2);
 bool is_Matrix_Row_Zero(Matrix_Type A, unsigned int row, unsigned int col, unsigned int i);
 bool is_Matrix_Column_Zero(Matrix_Type A, unsigned int row, unsigned int col, unsigned int j);
+bool is_Matrix_Upper_Triangle(Matrix_Type A, unsigned int row, unsigned int col);
+bool is_Matrix_Lower_Triangle(Matrix_Type A, unsigned int row, unsigned int col);
 #endif /*MATRIX_H*/
