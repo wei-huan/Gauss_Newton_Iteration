@@ -5,6 +5,9 @@
         "math.h": "c",
         "cmath": "c",
         "*.tcc": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "gauss_newton_iteration.h": "c",
+        "utils.h": "c",
+        "levenberg_marquardt_iteration.h": "c"
     }
 }

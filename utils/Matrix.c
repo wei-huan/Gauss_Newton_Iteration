@@ -2,9 +2,10 @@
 
 //row行, col列
 void Visit_Matrix(Matrix_Type A, unsigned int row, unsigned int col){
+
     for(unsigned int i = 0; i < row; i++){
         for(unsigned int j = 0; j < col; j++)
-            printf("%.2f ", ele(A, col, i, j));
+            printf("%.3f ", ele(A, col, i, j));
         EOL;
     }
 }
@@ -67,25 +68,25 @@ void Matrix_Multiplication(Matrix_Type A, Matrix_Type B, Matrix_Type C, unsigned
 // B = A-1 A为m阶方阵, B = A-1 = A* / detA
 void Matrix_Inverse_Adjoint_Matrix(Matrix_Type A, Matrix_Type B, unsigned int m){
     Matrix_datatype detA = 0.0;
-    Matrix_datatype C[4][4] = {0.0};
+    // Matrix_datatype C[6][6] = {0.0};
 
     // 求 A 的伴随矩阵 B
     for(unsigned int i = 0; i < m; i++)
         for(unsigned int j = 0; j < m; j++)
             ele(B, m, i, j) = pow(-1, i + j) * Matrix_Cofactor(A, m, j, i);
     
-    printf("A*:\n");
-    Visit_Matrix(B, m, m);
+    // printf("A*:\n");
+    // Visit_Matrix(B, m, m);
 
     // A * A*
-    Matrix_Multiplication((Matrix_Type)A, (Matrix_Type)B, (Matrix_Type)C, 4, 4, 4);
-    printf("A * A*:\n");
-    Visit_Matrix((Matrix_Type)C, m, m);
+    // Matrix_Multiplication((Matrix_Type)A, (Matrix_Type)B, (Matrix_Type)C, m, m, m);
+    // printf("A * A*:\n");
+    // Visit_Matrix((Matrix_Type)C, m, m);
 
     // 求 A 的行列式 detA
     for(unsigned int j = 0; j < m; j++)
         detA += ele(A, m, 0, j) * ele(B, m, j, 0);
-    printf("detA: %.2f\n", detA);
+    // printf("detA: %.2f\n", detA);
 
     //detA == 0说明矩阵不可逆
     if(detA == 0){
@@ -353,3 +354,45 @@ bool is_Matrix_Column_Zero(Matrix_Type A, unsigned int row, unsigned int col, un
 
 bool is_Matrix_Upper_Triangle(Matrix_Type A, unsigned int row, unsigned int col);
 bool is_Matrix_Lower_Triangle(Matrix_Type A, unsigned int row, unsigned int col);
+
+void Lineral_Equations_Gauss_Jordan(Matrix_Type coei, Matrix_Type sol, unsigned int var_num){
+    unsigned int switch_row = 0;
+    unsigned int i = 0;
+
+    /* 行初等变换将coei化为单位矩阵, 同时对sol做相同的操作 */
+    // 对每一列做相同的操作
+    for(unsigned int j = 0; j < var_num; j++){
+        i = j;
+
+        // 先确定coei[i][j]是不是0, 如果是得先调换另一行
+        if(ele(coei, var_num, i, j) == (Matrix_datatype)0.0f){
+            // 从下一行开始查找该列是否有非0元, 如果有该列有非0元则找到首个非0元所在的行调换
+            switch_row = i + 1;
+            while(switch_row < var_num)
+                if(ele(coei, var_num, switch_row, j) == (Matrix_datatype)0.0f)
+                    switch_row++;
+                else
+                    break;
+                    
+            if(switch_row == var_num){
+                printf("矩阵该行以下全0, 没有唯一解\n");
+                return ;
+            }
+
+            Matrix_Row_Switch((Matrix_Type)sol, var_num, 1, i, switch_row);
+            Matrix_Row_Switch((Matrix_Type)coei, var_num, var_num, i, switch_row);
+        }
+
+        // 将a[i][j]系数化为1
+        Matrix_Row_Multiplication((Matrix_Type)sol, var_num, 1, (1.0f / ele(coei, var_num, i, j)), i);
+        Matrix_Row_Multiplication((Matrix_Type)coei, var_num, var_num, (1.0f / ele(coei, var_num, i, j)), i);
+
+        // 将其他列化为0
+        for(unsigned int k = 0; k < var_num; k++){
+            if(k != i){
+                Matrix_Row_Add2Another((Matrix_Type)sol, var_num, 1, (-1.0f * ele(coei, var_num, k, j)), i, k);
+                Matrix_Row_Add2Another((Matrix_Type)coei, var_num, var_num, (-1.0f * ele(coei, var_num, k, j)), i, k);
+            }
+        }
+    }
+}

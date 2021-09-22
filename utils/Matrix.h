@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "utils.h"
 
 typedef float Matrix_datatype;
 typedef Matrix_datatype* Matrix_data_P_Type;
@@ -37,4 +38,5 @@ bool is_Matrix_Row_Zero(Matrix_Type A, unsigned int row, unsigned int col, unsig
 bool is_Matrix_Column_Zero(Matrix_Type A, unsigned int row, unsigned int col, unsigned int j);
 bool is_Matrix_Upper_Triangle(Matrix_Type A, unsigned int row, unsigned int col);
 bool is_Matrix_Lower_Triangle(Matrix_Type A, unsigned int row, unsigned int col);
+void Lineral_Equations_Gauss_Jordan(Matrix_Type coei,  Matrix_Type sol, unsigned int var_num);
 #endif /*MATRIX_H*/
