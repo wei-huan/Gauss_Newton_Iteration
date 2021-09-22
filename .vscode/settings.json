@@ -8,6 +8,7 @@
         "cstdlib": "c",
         "gauss_newton_iteration.h": "c",
         "utils.h": "c",
-        "levenberg_marquardt_iteration.h": "c"
+        "levenberg_marquardt_iteration.h": "c",
+        "rotate_matrix.h": "c"
     }
 }
