@@ -7,8 +7,8 @@ void GNI_Acce(Matrix_Type acce, Matrix_Type bias_coei){
     int count = 0;
     // D是6个参数的变化矩阵
     Matrix_datatype D[6][1] = {0.0};
-    // 6个姿态的偏导数矩阵
-    Matrix_datatype prtl_deri[6][6] = {0.0};
+    // 6个姿态的偏导数矩阵, 即雅可比矩阵
+    Matrix_datatype J[6][6] = {0.0};
     // 偏导数乘法矩阵
     Matrix_datatype M[6][6] = {0.0};
     // 偏导数乘目标
@@ -35,25 +35,26 @@ void GNI_Acce(Matrix_Type acce, Matrix_Type bias_coei){
     // Visit_Matrix((Matrix_Type)A_Square_Sum, 6, 1);
 
     while(count != 6){
-        /* 求6个姿态下的关于6个系数的偏导数 */
+        /* 求6个姿态下的关于6个系数的偏导数, 即雅可比矩阵 */
         // 求关于零偏系数的偏导数
         for(int i = 0; i < 3; i++)
             for(int j = 0; j < 6; j++)
                 // df/dox = -2 * (amx - dx) * kx^2
-                prtl_deri[i][j] = -2.0f * (ele(acce, 3, j, i) - ele(bias_coei, 1, i, 0)) * pow(ele(bias_coei, 1, i + 3, 0), 2);
+                J[i][j] = -2.0f * (ele(acce, 3, j, i) - ele(bias_coei, 1, i, 0)) * pow(ele(bias_coei, 1, i + 3, 0), 2);
 
         // 求关于刻度系数的偏导数
         for(int i = 3; i < 6; i++)
             for(int j = 0; j < 6; j++)
                 // df/dkx = 2 * (amx - dx) ^ 2 * kx
-                prtl_deri[i][j] = 2.0f * pow(ele(acce, 3, j, i - 3) - ele(bias_coei, 1, i - 3, 0), 2) * ele(bias_coei, 1, i, 0);
+                J[i][j] = 2.0f * pow(ele(acce, 3, j, i - 3) - ele(bias_coei, 1, i - 3, 0), 2) * ele(bias_coei, 1, i, 0);
 
         Init_Matrix_Zero((Matrix_Type)M, 6, 6);
+
         for(int i = 0; i < 6; i++)
             for(int j = 0; j < 6; j++)
                 for(int t = 0; t < 6; t++)
                     // Mij = Σ6(df/dci * df/dcj)
-                    M[i][j] += prtl_deri[i][t] * prtl_deri[j][t];
+                    M[i][j] += J[i][t] * J[j][t];
         
         // get_var_name(M);
         // Visit_Matrix((Matrix_Type)M, 6, 6);
@@ -61,8 +62,8 @@ void GNI_Acce(Matrix_Type acce, Matrix_Type bias_coei){
         Init_Matrix_Zero((Matrix_Type)A, 6, 1);
         for(int i = 0; i < 6; i++)
             for(int j = 0; j < 6; j++)
-                // Ai = Σ6(df/dci * (T - fk0)) 
-                A[i][0] += prtl_deri[i][j] * (1 - A_Square_Sum[j][0]);
+                // Ai = Σ6(df/dci * (T - fk0))
+                A[i][0] += J[i][j] * (1 - A_Square_Sum[j][0]);
 
         // get_var_name(A);
         // Visit_Matrix((Matrix_Type)A, 6, 1);
@@ -88,8 +89,7 @@ void GNI_Acce(Matrix_Type acce, Matrix_Type bias_coei){
                                + pow((ele(acce, 3, i, 1) - ele(bias_coei, 1, 1, 0)) * ele(bias_coei, 1, 4, 0), 2)\
                                + pow((ele(acce, 3, i, 2) - ele(bias_coei, 1, 2, 0)) * ele(bias_coei, 1, 5, 0), 2);
 
-        // get_var_name(A_Square_Sum);
-        // Visit_Matrix((Matrix_Type)A_Square_Sum, 6, 1);
+
 
         // 如果变化量已经很小了, 说明迭代得差不多了
         count = 0;
@@ -97,5 +97,8 @@ void GNI_Acce(Matrix_Type acce, Matrix_Type bias_coei){
         for(int i = 0; i < 6; i++)
             if(abstract(D[i][0]) <= PERMIT_DIFF)
                 count++;
-    }
+    }        
+    
+    // get_var_name(A_Square_Sum);
+    // Visit_Matrix((Matrix_Type)A_Square_Sum, 6, 1);
 }

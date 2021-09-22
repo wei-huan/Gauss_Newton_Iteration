@@ -49,6 +49,14 @@ void Matrix_Subtraction(Matrix_Type A, Matrix_Type B, Matrix_Type C, unsigned in
             ele(C, col, i, j) = ele(A, col, i, j) - ele(B, col, i, j);
 }
 
+// B[i][j] = m * A[i][j]
+void Matrix_Multi_Const(Matrix_Type A, Matrix_Type B, Matrix_datatype m, unsigned int row, unsigned int col){
+
+    for(unsigned int i = 0; i < row; i++)
+        for(unsigned int j = 0; j < col; j++)
+            ele(B, col, i, j) = ele(A, col, i, j) * m;
+}
+
 //C = A * B, A在左, B在右, Amt, Btn
 void Matrix_Multiplication(Matrix_Type A, Matrix_Type B, Matrix_Type C, unsigned int row1, unsigned int col1_row2, unsigned int col2){
     Matrix_datatype tmp;
@@ -219,11 +227,11 @@ Matrix_datatype Matrix_Cofactor(Matrix_Type A, unsigned int m, unsigned int i, u
     return cofactor;
 }
 
-// B = AT
-void Matrix_Transpose(Matrix_Type A, Matrix_Type B, unsigned int row, unsigned int col){
+// AT = A的转置
+void Matrix_Transpose(Matrix_Type A, Matrix_Type AT, unsigned int row, unsigned int col){
     for(unsigned int i = 0; i < row; i++)
         for(unsigned int j = 0; j < col; j++)
-            ele(B, row, j, i) = ele(A, col, i, j);
+            ele(AT, row, j, i) = ele(A, col, i, j);
 }
 
 // 行初等变换, 交换两行元素
