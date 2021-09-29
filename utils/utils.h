@@ -12,4 +12,6 @@ int round_up_round_down(double num);
 int fast_log2(int num);
 float radiant2degree(float radiant);
 float degree2radiant(float degree);
+double square(double x);
+double square_root(double n);
 #endif /*__UTILS_H*/

@@ -43,3 +43,32 @@ float degree2radiant(float degree){
 	radiant = degree / 180 * pi;
 	return radiant;
 }
+
+double square(double x){
+	return x * x;
+}
+
+// fx - 0 = fx'(x - x_new)
+// 牛顿法
+double square_root(double n){
+	double x = n / 2;
+	double df_dx = 0.0;
+	double close_thre = 0.001;
+	double fx = close_thre + 100;
+	unsigned int iter_count = 0;
+	
+	while(abstract(fx) > close_thre){
+			fx = square(x) - n;
+			df_dx = 2 * x;
+			x = x - fx / df_dx;
+		
+			iter_count++;
+		
+			if(iter_count > 100)
+				break;
+	}
+	
+//	printf("iter_count: %d\n", iter_count);
+//  printf("square_root: %f\n", x);
+	return x;
+}

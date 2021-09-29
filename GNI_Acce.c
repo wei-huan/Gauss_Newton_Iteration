@@ -8,7 +8,7 @@ void GNI_Acce(Matrix_Type acce, Matrix_Type bias_coei){
     // D是6个参数的变化矩阵
     Matrix_datatype D[6][1] = {0.0};
     // 6个姿态的偏导数矩阵, 即雅可比矩阵
-    Matrix_datatype J[6][6] = {0.0};
+    Matrix_datatype JT[6][6] = {0.0}, J[6][6] = {0.0};
     // 偏导数乘法矩阵
     Matrix_datatype M[6][6] = {0.0};
     // 偏导数乘目标
@@ -40,21 +40,22 @@ void GNI_Acce(Matrix_Type acce, Matrix_Type bias_coei){
         for(int i = 0; i < 3; i++)
             for(int j = 0; j < 6; j++)
                 // df/dox = -2 * (amx - dx) * kx^2
-                J[i][j] = -2.0f * (ele(acce, 3, j, i) - ele(bias_coei, 1, i, 0)) * pow(ele(bias_coei, 1, i + 3, 0), 2);
+                JT[i][j] = -2.0f * (ele(acce, 3, j, i) - ele(bias_coei, 1, i, 0)) * pow(ele(bias_coei, 1, i + 3, 0), 2);
 
         // 求关于刻度系数的偏导数
         for(int i = 3; i < 6; i++)
             for(int j = 0; j < 6; j++)
                 // df/dkx = 2 * (amx - dx) ^ 2 * kx
-                J[i][j] = 2.0f * pow(ele(acce, 3, j, i - 3) - ele(bias_coei, 1, i - 3, 0), 2) * ele(bias_coei, 1, i, 0);
+                JT[i][j] = 2.0f * pow(ele(acce, 3, j, i - 3) - ele(bias_coei, 1, i - 3, 0), 2) * ele(bias_coei, 1, i, 0);
 
+        Matrix_Transpose((Matrix_Type)JT, (Matrix_Type)J, 6, 6);
         Init_Matrix_Zero((Matrix_Type)M, 6, 6);
 
         for(int i = 0; i < 6; i++)
             for(int j = 0; j < 6; j++)
                 for(int t = 0; t < 6; t++)
                     // Mij = Σ6(df/dci * df/dcj)
-                    M[i][j] += J[i][t] * J[j][t];
+                    M[i][j] += JT[i][t] * JT[j][t];
         
         // get_var_name(M);
         // Visit_Matrix((Matrix_Type)M, 6, 6);
@@ -63,18 +64,18 @@ void GNI_Acce(Matrix_Type acce, Matrix_Type bias_coei){
         for(int i = 0; i < 6; i++)
             for(int j = 0; j < 6; j++)
                 // Ai = Σ6(df/dci * (T - fk0))
-                A[i][0] += J[i][j] * (1 - A_Square_Sum[j][0]);
+                A[i][0] += JT[i][j] * (1 - A_Square_Sum[j][0]);
 
         // get_var_name(A);
         // Visit_Matrix((Matrix_Type)A, 6, 1);
 
         // A = M * D;
         // D = M-1 * A;
-        Matrix_Inverse_Gauss_Jordan((Matrix_Type)M, (Matrix_Type)M_Inv, 6);
+        Matrix_Inverse_Gauss_JTordan((Matrix_Type)M, (Matrix_Type)M_Inv, 6);
         Matrix_Multiplication((Matrix_Type)M_Inv, (Matrix_Type)A, (Matrix_Type)D, 6, 6, 1);
 
         // // M * D = A; 
-        // Lineral_Equations_Gauss_Jordan((Matrix_Type)M, (Matrix_Type)A, 6);
+        // Lineral_Equations_Gauss_JTordan((Matrix_Type)M, (Matrix_Type)A, 6);
 
         // get_var_name(D);
         // Visit_Matrix((Matrix_Type)D, 6, 1);
