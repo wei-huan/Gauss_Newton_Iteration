@@ -17,11 +17,11 @@ int main(){
     Visit_Matrix((Matrix_Type)acce, 6, 3);
 
     start = clock();
-    for(int i = 0; i <10000; i++)
+    for(int i = 0; i <1; i++)
         GNI_Acce((Matrix_Type)acce, (Matrix_Type)bias_coei);
     finish = clock();
 
-    printf("run_time %2.5lfms\n", (double)(finish - start)/1000);
+    printf("run_time %2.5lfms\n", (double)(finish - start)/1);
     get_var_name(bias_coei);
     Visit_Matrix((Matrix_Type)bias_coei, 6, 1);
 

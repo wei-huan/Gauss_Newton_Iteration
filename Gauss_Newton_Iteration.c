@@ -6,8 +6,6 @@ void Gauss_Newton_Iteration(Matrix_Type data, Matrix_Type coei, int coei_num, in
     Matrix_datatype J[rela_num][coei_num], JT[coei_num][rela_num];
     // 残差
     Matrix_datatype r[rela_num][1];
-    // 变化量
-    Matrix_datatype delta[coei_num][1];
     // 迭代停止阈值
     Matrix_datatype d_thre;
     // 参数变化量矩阵

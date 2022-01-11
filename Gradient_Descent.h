@@ -5,5 +5,5 @@
 #include "utils/Matrix.h"
 #include "utils/utils.h"
 
-void Gradient_Descent(int var_num, Matrix_Type start_point[var_num][1], Matrix_Type end_point[var_num][1]);
+// void Gradient_Descent(int var_num, Matrix_Type start_point[var_num][1], Matrix_Type end_point[var_num][1]);
 #endif /*GRADIENT_DESCENT*/

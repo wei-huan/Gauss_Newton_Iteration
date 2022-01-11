@@ -16,7 +16,7 @@ void Update_Pitch_Rot_Matrix(Matrix_Type Pitch_RM, Ang_Type pitch){
     ele(Pitch_RM, 3, 2, 0) = sin(pitch);
 }
 
-void Update_Roll_Rot_Matrix(Matrix_Type Yaw_RM, Ang_Type yaw){
+void Update_Yaw_Rot_Matrix(Matrix_Type Yaw_RM, Ang_Type yaw){
     ele(Yaw_RM, 3, 0, 0) = ele(Yaw_RM, 3, 1, 1) =  cos(yaw);
     ele(Yaw_RM, 3, 0, 1) = sin(yaw);
     ele(Yaw_RM, 3, 1, 0) = sin(-1 * yaw);
